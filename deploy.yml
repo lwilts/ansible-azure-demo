@@ -1,0 +1,15 @@
+---
+- hosts: control
+  connection: local
+  roles:
+  - azure 
+
+- hosts: control
+  connection: local
+  tasks:
+  - meta: refresh_inventory
+
+- hosts: azure
+  become: true
+  roles:
+  - zabbix

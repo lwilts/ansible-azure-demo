@@ -1,0 +1,86 @@
+---
+# tasks file for azure
+- name: Create a resource group
+  azure_rm_resourcegroup:
+    name: "{{ RESOURCE_GROUP }}"
+    location: uksouth
+    tags:
+      testing: testing
+      delete: never
+
+- name: Create storage account
+  azure_rm_storageaccount:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    name: "{{ STORAGE_ACC }}"
+    account_type: Standard_LRS
+
+- name: Create virtual network
+  azure_rm_virtualnetwork:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    name: testvn001
+    address_prefixes: "10.10.0.0/16"
+
+- name: Add subnet
+  azure_rm_subnet:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    name: subnet001
+    address_prefix: "10.10.0.0/24"
+    virtual_network: testvn001
+
+- name: Create public ip
+  azure_rm_publicipaddress:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    allocation_method: Static
+    name: "publicip_{{ VM_NAME }}"
+  register:
+    publicip
+
+- name: checkout the ip
+  debug:
+    var : publicip
+
+- name: Create security group that allows SSH
+  azure_rm_securitygroup:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    name: secgroup001
+    rules:
+      - name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: Allow
+        priority: 101
+        direction: Inbound
+
+- name: Create NIC
+  azure_rm_networkinterface:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    name: "{{ VM_NAME|default('testvm001') }}_nic1"
+    virtual_network: testvn001
+    subnet: subnet001
+    public_ip_name: "publicip_{{ VM_NAME }}"
+    security_group: secgroup001
+
+- name: Create virtual machine
+  azure_rm_virtualmachine:
+    resource_group: "{{ RESOURCE_GROUP }}"
+    name: "{{ VM_NAME|default('testvm001') }}"
+    vm_size: "{{ VM_SIZE }}" 
+    storage_account: "{{ STORAGE_ACC }}"
+    storage_container: "{{ VM_NAME }}"
+    storage_blob: "{{ VM_NAME }}.vhd"
+    admin_username: "{{ VM_USER }}"
+    ssh_password_enabled: false
+    ssh_public_keys:
+        - path: "/home/{{ VM_USER }}/.ssh/authorized_keys"
+          key_data: "{{ PUB_KEY }}"
+    network_interfaces: "{{ VM_NAME|default('testvm001') }}_nic1"
+    image:
+      offer: CentOS
+      publisher: OpenLogic
+      sku: '7.2'
+      version: latest
+  register : azure_vm
+
+- add_host: name="{{ publicip.state.ip_address }}" 
+            groups=azure_vms
+            ansible_user="{{ VM_USER }}"
