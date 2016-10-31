@@ -1,2 +1,2 @@
 [control]
-localhost
+azure-portal ansible_host=localhost

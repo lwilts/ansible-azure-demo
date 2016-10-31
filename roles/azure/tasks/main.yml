@@ -1,4 +1,5 @@
 ---
+
 # tasks file for azure
 - name: Create a resource group
   azure_rm_resourcegroup:

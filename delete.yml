@@ -1,12 +1,13 @@
 ---
 - hosts: control
   connection: local
+  vars_files:
+  - roles/azure/vars/main.yml 
   tasks:
-
   - name: remove vm and all resources except public ips
     azure_rm_virtualmachine:
       resource_group: LWTEST1
-      name: "{{ VMNAME }}"
+      name: "{{ VM_NAME }}"
       state: absent
       remove_on_absent:
         - network_interfaces
