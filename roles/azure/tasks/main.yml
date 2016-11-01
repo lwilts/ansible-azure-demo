@@ -55,7 +55,7 @@
 - name: Create NIC
   azure_rm_networkinterface:
     resource_group: "{{ RESOURCE_GROUP }}"
-    name: "{{ VM_NAME|default('testvm001') }}_nic1"
+    name: "{{ VM_NAME }}_nic1"
     virtual_network: testvn001
     subnet: subnet001
     public_ip_name: "publicip_{{ VM_NAME }}"
@@ -74,7 +74,7 @@
     ssh_public_keys:
         - path: "/home/{{ VM_USER }}/.ssh/authorized_keys"
           key_data: "{{ PUB_KEY }}"
-    network_interfaces: "{{ VM_NAME|default('testvm001') }}_nic1"
+    network_interfaces: "{{ VM_NAME }}_nic1"
     image:
       offer: CentOS
       publisher: OpenLogic
