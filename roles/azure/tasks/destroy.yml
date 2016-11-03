@@ -1,0 +1,10 @@
+---
+- name: remove VM(s) by tag and all resources except public IPs
+  azure_rm_virtualmachine:
+    resource_group: "{{ RESOURCE_GROUP }}" 
+    name: "{{ VM_NAME }}"
+    tags: "{{ VM_TAGS }}"
+    state: absent
+    remove_on_absent:
+    - network_interfaces
+    - virtual_storage

@@ -1,0 +1,18 @@
+---
+- name: Copy Logstash certificate to server
+  copy: src=certs/logstash-forwarder.crt dest=/etc/pki/tls/
+
+- name: Add Elastic GPG key
+  rpm_key: state=present key=http://packages.elastic.co/GPG-KEY-elasticsearch
+
+- name: Add repo file from template
+  template: src=elastic-beats.repo.j2 dest=/etc/yum.repos.d/elastic-beats.repo owner=root mode=0644
+
+- name: Install Filebeat
+  yum: name=filebeat state=present 
+
+- name: Configure Filebeat for pushing syslogs to Logstash
+  template: src=filebeat.j2 dest=/etc/filebeat/filebeat.yml owner=root mode=0644
+
+- name: Restart and enable Filebeat service
+  systemd: name=filebeat enabled=yes state=started

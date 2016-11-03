@@ -1,0 +1,7 @@
+---
+- name: Install and configure ELK stack
+  become: true
+  script: roles/elk/files/deploy-elk.sh 
+
+- name: Fetch certificate for ELK server
+  fetch: src=/etc/pki/tls/certs/logstash-forwarder.crt dest=certs/

@@ -1,0 +1,4 @@
+*~
+*.retry
+*.pyc
+keys/azure_ssh_key

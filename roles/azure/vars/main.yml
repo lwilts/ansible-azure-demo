@@ -2,6 +2,36 @@
 VM_NAME: test1
 VM_USER: luke
 STORAGE_ACC: lwaccount001 
-PUB_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChHOvMJ8QsgiGp4AS9UJXIkOGRwzcVbFa93xHLCZs6UqdkecCb9xv1AuXz//ujLzw3g/zyIkck9vjsS2f/ZjtxcUMx8Hu8Ytxrb/JfipUvhP8c8ZF9iDy5QPG4tH07jvkws7K6Ihggs80VNTMwSi49CdtinYakQicBGj5fLTAaV7RaZ3cu426bkPRsVq9lcLja0BwAYBVnXgMjPFY6qQWsfKsNlgSog/Tsk/usjEK8JCRINFRqGfT7hzoK954xAZRaMKnVCsxugL9isN5wY7BOu+Zp+NyBW1L5GW/zTHiHut4pxchpGtYDgxskgEbwwQZ2Fkv0Qnemj14RMe37bcsB
+PUB_KEY: "{{ lookup('file', 'keys/azure_ssh_key') }}"
 RESOURCE_GROUP: LWTEST1
-VM_SIZE: Basic_A0
+VM_SIZE: Basic_A1
+LOCATION: uksouth
+VIRTUAL_NETWORK:
+  NAME: testvn001
+  ADDRESSES: 10.10.0.0/16
+SUBNET:
+  NAME: subnet001
+  ADDRESSES: 10.10.0.0/24
+
+SECURITY_RULES:
+    ssh:
+        name: SSH
+        protocol: Tcp
+        destination_port_range: 22
+        access: allow
+        priority: 100
+        direction: Inbound
+    http:
+        name: HTTP
+        protocol: Tcp
+        destination_port_range: 80
+        access: allow
+        priority: 200
+        direction: Inbound
+    https:
+        name: HTTP
+        protocol: Tcp
+        destination_port_range: 443
+        access: allow
+        priority: 300
+        direction: Inbound
